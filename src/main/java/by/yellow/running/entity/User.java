@@ -6,6 +6,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Entity
 @Table(name = "User")
@@ -31,9 +32,15 @@ public class User {
     @javax.persistence.OrderBy("startTime")
     private SortedSet<Running> runningSet;
     @OneToMany(targetEntity = WeeklyReport.class, mappedBy = "user", fetch=FetchType.EAGER)
+    @javax.persistence.OrderBy("startDate")
     private SortedSet<WeeklyReport> weeklyReportsSet;
     @ManyToMany
     private Set<Role> roles;
+
+    public User() {
+        this.runningSet = new TreeSet<>();
+        this.weeklyReportsSet = new TreeSet<>();
+    }
 
     public Long getId() {
         return Id;
@@ -90,7 +97,14 @@ public class User {
 
     public void addWeeklyReport(WeeklyReport weeklyReport) {
         weeklyReport.setUser(this);
-        this.weeklyReportsSet.add(weeklyReport);
+        if (!this.weeklyReportsSet.isEmpty()) {
+            weeklyReport.setWeekNumber(this.weeklyReportsSet.last().getWeekNumber() + 1);
+            this.weeklyReportsSet.add(weeklyReport);
+        }
+        else {
+            weeklyReport.setWeekNumber(1);
+            this.weeklyReportsSet.add(weeklyReport);
+        }
     }
 
     public Set<Role> getRoles() {

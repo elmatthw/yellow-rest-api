@@ -1,15 +1,10 @@
 package by.yellow.running.controller;
 
-import by.yellow.running.UserValidator;
-import by.yellow.running.entity.Running;
 import by.yellow.running.entity.User;
 import by.yellow.running.repository.RunningRepository;
 import by.yellow.running.repository.UserRepository;
-import by.yellow.running.service.ISecurityService;
-import by.yellow.running.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -17,16 +12,16 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/users")
 public class UserController {
-    @Autowired
-    private UserService userService;
+    /*@Autowired
+    private UserService userService;*/
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private RunningRepository runningRepository;
-    @Autowired
-    private UserValidator userValidator;
-    @Autowired
-    private ISecurityService securityService;
+    /*@Autowired
+    private UserValidator userValidator;*/
+    /*@Autowired
+    private ISecurityService securityService;*/
 
     /*@Autowired
     public UserController(UserService userService, UserRepository userRepository, UserValidator userValidator) {
@@ -42,7 +37,7 @@ public class UserController {
 
 
 
-    @PostMapping("/signup")
+    /*@PostMapping("/signup")
     public @ResponseBody User signUp(@RequestParam String username,
                                      @RequestParam String password,
                                      @RequestParam String email,
@@ -64,10 +59,16 @@ public class UserController {
         securityService.autoLogin(newUser.getUsername(), newUser.getPassword());
 
         return newUser;
-    }
+    }*/
 
     /*@PostMapping("/login")
     public @ResponseBody User logIn()*/
+
+    @GetMapping("/")
+    public @ResponseBody
+    Iterable<User> getUsers(){
+        return userRepository.findAll();
+    }
 
     @GetMapping("/user")
     public @ResponseBody

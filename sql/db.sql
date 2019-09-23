@@ -39,6 +39,7 @@ DROP TABLE IF EXISTS `yellow`.`WeeklyReport` ;
 
 CREATE TABLE IF NOT EXISTS `yellow`.`WeeklyReport` (
                                                      `WEEKLYREPORT_ID` BIGINT NOT NULL AUTO_INCREMENT,
+                                                     `weekNumber` INT,
                                                      `averageSpeed` DOUBLE NOT NULL,
                                                      `averageTime` VARCHAR(45) NOT NULL,
                                                      `totalDistance` DOUBLE NOT NULL,

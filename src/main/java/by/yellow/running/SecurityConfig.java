@@ -1,3 +1,4 @@
+/*
 package by.yellow.running;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    /*@Autowired
+    */
+/*@Autowired
     private UserDetailsService userDetailsService;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder(){
         return new BCryptPasswordEncoder();
-    }*/
+    }*//*
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,13 +46,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return authenticationManager();
     }
 
-    /*@Bean
+    */
+/*@Bean
     public UserDetailsService userDetailsService() {
         return super.userDetailsService();
-    }*/
+    }*//*
 
-    /*@Autowired
+
+    */
+/*@Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
-    }*/
+    }*//*
+
 }
+*/

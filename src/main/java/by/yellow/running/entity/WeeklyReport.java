@@ -1,17 +1,19 @@
 package by.yellow.running.entity;
 
 import javax.persistence.*;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Entity
 @Table(name = "WeeklyReport")
-public class WeeklyReport {
+public class WeeklyReport implements Comparable<WeeklyReport> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long WEEKLYREPORT_ID;
-    /*@Column("")
-    private int weekNumber;*/
+    @Column(name = "WEEKLYREPORT_ID")
+    private Long id;
+    private int weekNumber;
     private double averageSpeed;
     private String averageTime;
     private double totalDistance;
@@ -25,11 +27,11 @@ public class WeeklyReport {
     private User user;
 
     public WeeklyReport() {
-
+        this.runningSet = new TreeSet<>();
     }
 
-    public WeeklyReport(Long WEEKLYREPORT_ID, /*int weekNumber, */double averageSpeed, String averageTime, double totalDistance, SortedSet<Running> runningSet) {
-        this.WEEKLYREPORT_ID = WEEKLYREPORT_ID;
+    public WeeklyReport(Long id, /*int weekNumber, */double averageSpeed, String averageTime, double totalDistance, SortedSet<Running> runningSet) {
+        this.id = id;
         /*this.weekNumber = weekNumber;*/
         this.averageSpeed = averageSpeed;
         this.averageTime = averageTime;
@@ -37,21 +39,21 @@ public class WeeklyReport {
         this.runningSet = runningSet;
     }
 
-    public Long getWEEKLYREPORT_ID() {
-        return WEEKLYREPORT_ID;
+    public Long getid() {
+        return id;
     }
 
-    public void setWEEKLYREPORT_ID(Long WEEKLYREPORT_ID) {
-        this.WEEKLYREPORT_ID = WEEKLYREPORT_ID;
+    public void setid(Long id) {
+        this.id = id;
     }
 
-/*    public int getWeekNumber() {
+    public int getWeekNumber() {
         return weekNumber;
     }
 
     public void setWeekNumber(int weekNumber) {
         this.weekNumber = weekNumber;
-    }*/
+    }
 
     public double getAverageSpeed() {
         return averageSpeed;
@@ -108,5 +110,12 @@ public class WeeklyReport {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public int compareTo(WeeklyReport o) {
+        if (startDate == null)
+            return -1;
+        return startDate.compareTo(o.startDate);
     }
 }

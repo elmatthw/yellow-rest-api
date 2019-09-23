@@ -1,3 +1,4 @@
+/*
 package by.yellow.running.service;
 
 import by.yellow.running.entity.Role;
@@ -39,3 +40,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         );
     }
 }
+*/

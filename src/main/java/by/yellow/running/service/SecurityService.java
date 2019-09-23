@@ -1,3 +1,4 @@
+/*
 package by.yellow.running.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,3 +38,4 @@ public class SecurityService implements ISecurityService {
         }
     }
 }
+*/

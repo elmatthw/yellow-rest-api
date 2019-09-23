@@ -1,3 +1,4 @@
+/*
 package by.yellow.running;
 
 import by.yellow.running.entity.User;
@@ -21,3 +22,4 @@ public class UserValidator implements Validator {
         }
     }
 }
+*/

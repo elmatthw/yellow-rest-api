@@ -1,16 +1,22 @@
 package by.yellow.running.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
+import java.util.Comparator;
 import java.util.Date;
 
 @Entity
 @Table(name = "Running")
-public class Running {
+public class Running implements Comparable<Running> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long RUNNING_ID;
+    @Column(name = "RUNNING_ID")
+    private Long id;
     private double distance;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date startTime;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date finishTime;
     @ManyToOne(targetEntity = User.class)
     @JoinColumn(name = "USER_ID", nullable = false)
@@ -22,19 +28,19 @@ public class Running {
     public Running() {
     }
 
-    public Running(long RUNNING_ID, double distance, Date startTime, Date finishTime) {
-        this.RUNNING_ID = RUNNING_ID;
+    public Running(long id, double distance, Date startTime, Date finishTime) {
+        this.id = id;
         this.distance = distance;
         this.startTime = startTime;
         this.finishTime = finishTime;
     }
 
-    public Long getRUNNING_ID() {
-        return RUNNING_ID;
+    public Long getid() {
+        return id;
     }
 
-    public void setRUNNING_ID(Long RUNNING_ID) {
-        this.RUNNING_ID = RUNNING_ID;
+    public void setid(Long id) {
+        this.id = id;
     }
 
     public double getDistance() {
@@ -61,7 +67,6 @@ public class Running {
         this.finishTime = finishTime;
     }
 
-
     public User getUser() {
         return user;
     }
@@ -77,5 +82,13 @@ public class Running {
 
     public void setWeeklyReport(WeeklyReport weeklyReport) {
         this.weeklyReport = weeklyReport;
+    }
+
+
+    @Override
+    public int compareTo(Running o) {
+        if (startTime == null)
+            return -1;
+        return startTime.compareTo(o.getStartTime());
     }
 }

@@ -8,7 +8,9 @@ import by.yellow.running.repository.UserRepository;
 import by.yellow.running.repository.WeeklyReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.SortedSet;
 
 @Service
@@ -16,17 +18,28 @@ public class RunningService implements IRunningService{
     @Autowired
     private RunningRepository runningRepository;
     @Autowired
-    private WeeklyReportRepository weeklyReportRepository;
+    private IWeeklyReportService weeklyReportService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private WeeklyReportRepository weeklyReportRepository;
 
     @Override
-    public void addRunning(Running running) {
+    public Running addRunning(Running running) {
         User user = running.getUser();
         SortedSet<WeeklyReport> weeklyReports = user.getWeeklyReportsSet();
-        if (weeklyReports == null) {
-            WeeklyReport weeklyReport = new WeeklyReport();
+        if (!weeklyReports.isEmpty() && weeklyReportService.isReportReady(weeklyReports.last(), running)) {
+            WeeklyReport weeklyReport = weeklyReportService.updateReport(weeklyReports.last(), running);
+            user.addWeeklyReport(weeklyReport);
+            weeklyReportRepository.save(weeklyReport);
         }
-
+        else {
+            WeeklyReport weeklyReport = new WeeklyReport();
+            user.addWeeklyReport(weeklyReportService.updateReport(weeklyReport, running));
+            weeklyReportRepository.save(weeklyReport);
+        }
+        userRepository.save(user);
+        System.out.println(running.getStartTime());
+        return runningRepository.save(running);
     }
 }

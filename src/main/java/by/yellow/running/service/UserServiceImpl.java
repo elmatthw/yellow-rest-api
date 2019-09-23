@@ -1,3 +1,4 @@
+/*
 package by.yellow.running.service;
 
 import by.yellow.running.entity.Role;
@@ -18,12 +19,16 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
-    /*@Autowired
-    private BCryptPasswordEncoder encoder;*/
+    */
+/*@Autowired
+    private BCryptPasswordEncoder encoder;*//*
+
 
     @Override
     public void save(User user) {
-        /*user.setPassword(encoder.encode(user.getPassword()));*/
+        */
+/*user.setPassword(encoder.encode(user.getPassword()));*//*
+
         user.setRoles(new HashSet<>((Collection<Role>) roleRepository.findAll()));
         userRepository.save(user);
     }
@@ -33,3 +38,4 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(username);
     }
 }
+*/
