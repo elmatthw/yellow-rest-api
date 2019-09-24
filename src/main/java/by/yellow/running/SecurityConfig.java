@@ -1,63 +1,48 @@
-/*
 package by.yellow.running;
 
+import by.yellow.running.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    */
-/*@Autowired
-    private UserDetailsService userDetailsService;
+    @Autowired
+    public CustomUserDetailsService customUserDetailsService;
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }*//*
+    }
 
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+                .userDetailsService(customUserDetailsService)
+                .passwordEncoder(passwordEncoder());
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .httpBasic()
+                .and()
                 .authorizeRequests()
-                    .antMatchers("/users/signup ").permitAll()
-                    .anyRequest().authenticated()
-                    .and()
-                .formLogin()
-                    .loginPage("/users/login")
-                    .permitAll()
-                    .and()
-                .logout()
-                    .permitAll();
+                .antMatchers("/users/?").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/users/{\\d+}/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers(HttpMethod.POST, "/users/{\\d+}/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers(HttpMethod.PUT, "/users/{\\d+}/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+                .and()
+                .csrf().disable()
+                .formLogin().disable();
     }
-
-    @Bean
-    public AuthenticationManager customAuthenticationManager() throws Exception {
-        return authenticationManager();
-    }
-
-    */
-/*@Bean
-    public UserDetailsService userDetailsService() {
-        return super.userDetailsService();
-    }*//*
-
-
-    */
-/*@Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
-    }*//*
-
 }
-*/
