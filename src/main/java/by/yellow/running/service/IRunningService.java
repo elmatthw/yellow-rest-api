@@ -2,6 +2,8 @@ package by.yellow.running.service;
 
 import by.yellow.running.entity.Running;
 
+import java.util.Optional;
+
 public interface IRunningService {
-    Running addRunning(Running running);
+    Optional<Running> addRunning(Running running);
 }

@@ -70,13 +70,13 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping("/user")
+    @GetMapping("/{id}")
     public @ResponseBody
-    Optional<User> getUser(@RequestParam String id){
+    Optional<User> getUser(@PathVariable String id){
         return userRepository.findById(Long.parseLong(id));
     }
 
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/{id}")
     public @ResponseBody String deleteUser(@PathVariable String id){
         userRepository.deleteById(Long.parseLong(id));
         return "User deleted";
@@ -87,7 +87,7 @@ public class UserController {
         userRepository.deleteAll();
         return "User deleted";
     }
-    @PostMapping("/user")
+    @PostMapping("/")
     public @ResponseBody User addNewUser(@RequestBody User user){
         return userRepository.save(user);
     }

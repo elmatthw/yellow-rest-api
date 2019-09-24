@@ -1,5 +1,7 @@
 package by.yellow.running.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -28,13 +30,15 @@ public class User {
     private String password;
     @Transient
     private String passwordConfirm;
-    @OneToMany(targetEntity = Running.class, mappedBy = "user", fetch=FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @javax.persistence.OrderBy("startTime")
+    @JsonManagedReference("user_running")
     private SortedSet<Running> runningSet;
-    @OneToMany(targetEntity = WeeklyReport.class, mappedBy = "user", fetch=FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @javax.persistence.OrderBy("startDate")
+    @JsonManagedReference
     private SortedSet<WeeklyReport> weeklyReportsSet;
-    @ManyToMany
+    @ManyToMany(mappedBy = "users")
     private Set<Role> roles;
 
     public User() {

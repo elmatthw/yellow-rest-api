@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.SortedSet;
 
 @Service
@@ -25,7 +26,7 @@ public class RunningService implements IRunningService{
     private WeeklyReportRepository weeklyReportRepository;
 
     @Override
-    public Running addRunning(Running running) {
+    public Optional<Running> addRunning(Running running) {
         User user = running.getUser();
         SortedSet<WeeklyReport> weeklyReports = user.getWeeklyReportsSet();
         if (!weeklyReports.isEmpty() && weeklyReportService.isReportReady(weeklyReports.last(), running)) {
@@ -36,10 +37,10 @@ public class RunningService implements IRunningService{
         else {
             WeeklyReport weeklyReport = new WeeklyReport();
             user.addWeeklyReport(weeklyReportService.updateReport(weeklyReport, running));
+            weeklyReport.setUser(user);
             weeklyReportRepository.save(weeklyReport);
         }
         userRepository.save(user);
-        System.out.println(running.getStartTime());
-        return runningRepository.save(running);
+        return runningRepository.findById(runningRepository.save(running).getid());
     }
 }

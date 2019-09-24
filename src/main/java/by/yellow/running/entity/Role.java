@@ -1,5 +1,7 @@
 package by.yellow.running.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -10,8 +12,15 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ROLE_ID")
     private Long id;
+    @Column(name = "name")
     private String name;
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany
+    @JoinTable(
+            name = "User_Role",
+            joinColumns = @JoinColumn(name = "Role_ROLE_ID"),
+            inverseJoinColumns = @JoinColumn(name = "User_USER_ID")
+    )
+    @JsonIgnore
     private Set<User> users;
 
     public Long getid() {

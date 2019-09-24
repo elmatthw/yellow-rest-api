@@ -2,19 +2,13 @@ package by.yellow.running.service;
 
 import by.yellow.running.entity.Running;
 import by.yellow.running.entity.WeeklyReport;
-import by.yellow.running.repository.WeeklyReportRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.SortedSet;
+import java.util.*;
 
 @Service
 public class WeeklyReportService implements IWeeklyReportService{
-    @Autowired
-    private WeeklyReportRepository weeklyReportRepository;
 
-// TODO: rename method - not obvious what it's doing
     @Override
     public boolean isReportReady(WeeklyReport weeklyReport, Running running) {
         Date runningStartTime = running.getStartTime();
@@ -27,7 +21,10 @@ public class WeeklyReportService implements IWeeklyReportService{
     @Override
     public WeeklyReport updateReport(WeeklyReport weeklyReport, Running running) {
         weeklyReport.addRunning(running);
+        System.out.println(weeklyReport);
         SortedSet<Running> runningSet = weeklyReport.getRunningSet();
+        System.out.println(weeklyReport.getTotalDistance());
+        System.out.println(runningSet.last().getDistance());
         weeklyReport.setTotalDistance(weeklyReport.getTotalDistance() + runningSet.last().getDistance());
         long totalTimeSec = calculateTotalTimeSeconds(running.getStartTime(), running.getFinishTime());
         weeklyReport.setAverageTime(
@@ -35,9 +32,25 @@ public class WeeklyReportService implements IWeeklyReportService{
                         totalTimeSec,
                         runningSet.size())
         );
-        weeklyReport.setEndDate(running.getStartTime());
-        weeklyReport.setTotalDistance(calculateAverageSpeed(weeklyReport.getTotalDistance(), (double)totalTimeSec));
+        if (weeklyReport.getStartDate() == null) {
+            weeklyReport.setStartDate(running.getStartTime());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(weeklyReport.getStartDate());
+            calendar.add(Calendar.DATE, 7);
+            Date endDate = calendar.getTime();
+            weeklyReport.setEndDate(endDate);
+        }
+        weeklyReport.setAverageSpeed(calculateAverageSpeed(weeklyReport.getTotalDistance(), (double)totalTimeSec));
         return weeklyReport;
+    }
+
+    private Long convertStringToSeconds(String time){
+        List<String> timeArray = Arrays.asList(time.split(":"));
+        long hours = Long.parseLong(timeArray.get(0));
+        long minutes = Long.parseLong(timeArray.get(1));
+        long seconds = Long.parseLong(timeArray.get(2));
+
+        return seconds + minutes * 60 + hours * 3600;
     }
 
     private Long calculateTotalTimeSeconds(Date start, Date end){
@@ -49,10 +62,7 @@ public class WeeklyReportService implements IWeeklyReportService{
     private String calculateAverageTime(String averageTime, long newTotalTime, int amount){
         long newAverageTime;
         if (averageTime != null) {
-            long hours = Long.getLong(averageTime.split(":")[0]);
-            long minutes = Long.getLong(averageTime.split(":")[1]);
-            long seconds = Long.getLong(averageTime.split(":")[2]);
-            newAverageTime = ((seconds + minutes * 60 + hours * 3600) * (amount - 1) + newTotalTime) / amount;
+            newAverageTime = (convertStringToSeconds(averageTime) * (amount - 1) + newTotalTime) / amount;
         }
         else
             newAverageTime = newTotalTime;

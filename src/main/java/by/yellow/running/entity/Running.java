@@ -1,5 +1,6 @@
 package by.yellow.running.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
@@ -13,16 +14,23 @@ public class Running implements Comparable<Running> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "RUNNING_ID")
     private Long id;
+    @Column(name = "distance")
     private double distance;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "startTime")
     private Date startTime;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "finishTime")
     private Date finishTime;
-    @ManyToOne(targetEntity = User.class)
-    @JoinColumn(name = "USER_ID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    @JsonBackReference("user_running")
     private User user;
-    @ManyToOne(targetEntity = WeeklyReport.class)
+    @ManyToOne
     @JoinColumn(name = "WEEKLYREPORT_ID")
+    @JsonBackReference("running_weekly")
     private WeeklyReport weeklyReport;
 
     public Running() {

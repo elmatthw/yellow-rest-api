@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @Controller
-//@SessionAttributes("user")
-@RequestMapping
 public class RunningController {
 
     private RunningRepository runningRepository;
@@ -41,8 +39,7 @@ public class RunningController {
     }
 
     @PostMapping("/users/{user_id}/running")
-    public @ResponseBody Running addRunning(@PathVariable String user_id, @RequestBody Running running){
-        System.out.println("here");
+    public @ResponseBody Optional<Running> addRunning(@PathVariable String user_id, @RequestBody Running running){
         User user = userRepository.findById(Long.parseLong(user_id)).get();
         user.addRunning(running);
         return runningService.addRunning(running);

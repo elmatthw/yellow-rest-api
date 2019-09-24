@@ -1,5 +1,8 @@
 package by.yellow.running.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.Comparator;
 import java.util.Date;
@@ -17,13 +20,17 @@ public class WeeklyReport implements Comparable<WeeklyReport> {
     private double averageSpeed;
     private String averageTime;
     private double totalDistance;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date startDate;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
-    @OneToMany(targetEntity = Running.class, mappedBy = "weeklyReport", fetch=FetchType.EAGER)
+    @OneToMany(mappedBy = "weeklyReport", cascade = CascadeType.ALL)
     @javax.persistence.OrderBy("startTime")
+    @JsonManagedReference("running_weekly")
     private SortedSet<Running> runningSet;
-    @ManyToOne(targetEntity = User.class)
-    @JoinColumn(name = "USER_ID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    @JsonBackReference
     private User user;
 
     public WeeklyReport() {
