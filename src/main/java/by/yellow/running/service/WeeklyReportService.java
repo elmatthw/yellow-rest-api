@@ -4,6 +4,7 @@ import by.yellow.running.entity.Running;
 import by.yellow.running.entity.WeeklyReport;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -21,16 +22,13 @@ public class WeeklyReportService implements IWeeklyReportService{
     @Override
     public WeeklyReport updateReport(WeeklyReport weeklyReport, Running running) {
         weeklyReport.addRunning(running);
-        System.out.println(weeklyReport);
         SortedSet<Running> runningSet = weeklyReport.getRunningSet();
-        System.out.println(weeklyReport.getTotalDistance());
-        System.out.println(runningSet.last().getDistance());
-        weeklyReport.setTotalDistance(weeklyReport.getTotalDistance() + runningSet.last().getDistance());
-        long totalTimeSec = calculateTotalTimeSeconds(running.getStartTime(), running.getFinishTime());
+        weeklyReport.setTotalDistance(calculateTotalDistance(weeklyReport));
+        long totalTimeSeconds = calculateTotalTimeInSeconds(weeklyReport);
         weeklyReport.setAverageTime(
-                calculateAverageTime(weeklyReport.getAverageTime(),
-                        totalTimeSec,
-                        runningSet.size())
+                convertSecondsToString(
+                        calculateAverageTimeSeconds(totalTimeSeconds, runningSet.size())
+                )
         );
         if (weeklyReport.getStartDate() == null) {
             weeklyReport.setStartDate(running.getStartTime());
@@ -40,38 +38,35 @@ public class WeeklyReportService implements IWeeklyReportService{
             Date endDate = calendar.getTime();
             weeklyReport.setEndDate(endDate);
         }
-        weeklyReport.setAverageSpeed(calculateAverageSpeed(weeklyReport.getTotalDistance(), (double)totalTimeSec));
+        weeklyReport.setAverageSpeed(calculateAverageSpeed(weeklyReport.getTotalDistance(), totalTimeSeconds));
         return weeklyReport;
     }
 
-    private Long convertStringToSeconds(String time){
-        List<String> timeArray = Arrays.asList(time.split(":"));
-        long hours = Long.parseLong(timeArray.get(0));
-        long minutes = Long.parseLong(timeArray.get(1));
-        long seconds = Long.parseLong(timeArray.get(2));
-
-        return seconds + minutes * 60 + hours * 3600;
-    }
-
-    private Long calculateTotalTimeSeconds(Date start, Date end){
-        long timeDifference = end.getTime() - start.getTime();
-
-        return timeDifference / 1000;
-    }
-
-    private String calculateAverageTime(String averageTime, long newTotalTime, int amount){
-        long newAverageTime;
-        if (averageTime != null) {
-            newAverageTime = (convertStringToSeconds(averageTime) * (amount - 1) + newTotalTime) / amount;
+    private Double calculateTotalDistance(WeeklyReport weeklyReport){
+        List<Double> list = new ArrayList<>();
+        for (Running running: weeklyReport.getRunningSet()) {
+            list.add(running.getDistance());
         }
-        else
-            newAverageTime = newTotalTime;
+        return list.stream()
+                .reduce(0.0, Double::sum);
+    }
 
+    private Long calculateTotalTimeInSeconds(WeeklyReport weeklyReport){
+        List<Long> list = new ArrayList<>();
+        for (Running running: weeklyReport.getRunningSet()) {
+            list.add(running.getFinishTime().getTime() -  running.getStartTime().getTime());
+        }
+        return list.stream()
+                .reduce(0L, Long::sum) / 1000;
+    }
 
-        String newAverageTimeString = String.join(":",
-                new String[]{String.valueOf((int) newAverageTime / 3600), String.valueOf((int) newAverageTime / 60 % 60),
-                        String.valueOf((int) newAverageTime % 60)});
-        return newAverageTimeString;
+    private String convertSecondsToString(Long time){
+        LocalTime timeOfDay = LocalTime.ofSecondOfDay(time);
+        return timeOfDay.toString();
+    }
+
+    private Long calculateAverageTimeSeconds(Long averageTime, int amount){
+        return averageTime / amount;
     }
 
     private double calculateAverageSpeed(double totalDistance, double totalTime){

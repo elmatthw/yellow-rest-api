@@ -31,13 +31,13 @@ public class RunningService implements IRunningService{
         SortedSet<WeeklyReport> weeklyReports = user.getWeeklyReportsSet();
         if (!weeklyReports.isEmpty() && weeklyReportService.isReportReady(weeklyReports.last(), running)) {
             WeeklyReport weeklyReport = weeklyReportService.updateReport(weeklyReports.last(), running);
-            user.addWeeklyReport(weeklyReport);
             weeklyReportRepository.save(weeklyReport);
         }
         else {
             WeeklyReport weeklyReport = new WeeklyReport();
             user.addWeeklyReport(weeklyReportService.updateReport(weeklyReport, running));
-            weeklyReport.setUser(user);
+            user.addWeeklyReport(weeklyReport);
+            /*weeklyReport.setUser(user);*/
             weeklyReportRepository.save(weeklyReport);
         }
         userRepository.save(user);

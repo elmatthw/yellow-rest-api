@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 @Entity
 @Table(name = "WeeklyReport")
@@ -35,15 +32,6 @@ public class WeeklyReport implements Comparable<WeeklyReport> {
 
     public WeeklyReport() {
         this.runningSet = new TreeSet<>();
-    }
-
-    public WeeklyReport(Long id, /*int weekNumber, */double averageSpeed, String averageTime, double totalDistance, SortedSet<Running> runningSet) {
-        this.id = id;
-        /*this.weekNumber = weekNumber;*/
-        this.averageSpeed = averageSpeed;
-        this.averageTime = averageTime;
-        this.totalDistance = totalDistance;
-        this.runningSet = runningSet;
     }
 
     public Long getid() {
