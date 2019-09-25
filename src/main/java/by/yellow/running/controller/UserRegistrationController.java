@@ -2,9 +2,7 @@ package by.yellow.running.controller;
 
 import by.yellow.running.entity.User;
 import by.yellow.running.exception.UsernameExistsException;
-import by.yellow.running.service.UserService;
 import by.yellow.running.exception.PasswordDoesntMatch;
-import by.yellow.running.exception.UsernameExistsException;
 import by.yellow.running.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -1,6 +1,6 @@
 package by.yellow.running;
 
-import by.yellow.running.service.CustomUserDetailsService;
+import by.yellow.running.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
