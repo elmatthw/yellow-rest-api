@@ -30,15 +30,15 @@ public class User {
     private String password;
     @Transient
     private String passwordConfirm;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @javax.persistence.OrderBy("startTime")
     @JsonManagedReference("user_running")
     private SortedSet<Running> runningSet;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @javax.persistence.OrderBy("startDate")
     @JsonManagedReference
     private SortedSet<WeeklyReport> weeklyReportsSet;
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
     private Set<Role> roles;
 
     public User() {

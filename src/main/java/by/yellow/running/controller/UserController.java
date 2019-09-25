@@ -12,57 +12,8 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/users")
 public class UserController {
-    /*@Autowired
-    private UserService userService;*/
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private RunningRepository runningRepository;
-    /*@Autowired
-    private UserValidator userValidator;*/
-    /*@Autowired
-    private ISecurityService securityService;*/
-
-    /*@Autowired
-    public UserController(UserService userService, UserRepository userRepository, UserValidator userValidator) {
-        this.userService = userService;
-        this.userRepository = userRepository;
-        this.userValidator = userValidator;
-    }*/
-
-    /*@Autowired
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }*/
-
-
-
-    /*@PostMapping("/signup")
-    public @ResponseBody User signUp(@RequestParam String username,
-                                     @RequestParam String password,
-                                     @RequestParam String email,
-                                     @RequestParam String confirmPassword,
-                                     BindingResult bindingResult){
-        User newUser = new User();
-        newUser.setEmail(email);
-        newUser.setUsername(username);
-        newUser.setPassword(password);
-        newUser.setPasswordConfirm(confirmPassword);
-        userValidator.validate(newUser, bindingResult);
-
-        if(bindingResult.hasErrors()){
-            return null;
-        }
-
-        userService.save(newUser);
-
-        securityService.autoLogin(newUser.getUsername(), newUser.getPassword());
-
-        return newUser;
-    }*/
-
-    /*@PostMapping("/login")
-    public @ResponseBody User logIn()*/
 
     @GetMapping("/")
     public @ResponseBody
