@@ -1,7 +1,6 @@
 package by.yellow.running.controller;
 
 import by.yellow.running.entity.User;
-import by.yellow.running.repository.RunningRepository;
 import by.yellow.running.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
