@@ -1,15 +1,15 @@
 package by.yellow.running.repository;
 
-import by.yellow.running.entity.User;
-import by.yellow.running.entity.WeeklyReport;
+import by.yellow.running.entity.UserEntity;
+import by.yellow.running.entity.WeeklyReportEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.SortedSet;
 
 @Repository
-public interface WeeklyReportRepository extends CrudRepository<WeeklyReport, Long> {
-    SortedSet<WeeklyReport> findAllByUser(User user);
-    WeeklyReport findByIdAndUser(Long id, User user);
-    void deleteByIdAndUser(Long id, User user);
+public interface WeeklyReportRepository extends CrudRepository<WeeklyReportEntity, Long> {
+    SortedSet<WeeklyReportEntity> findAllByUser(UserEntity user);
+    WeeklyReportEntity findByIdAndUser(Long id, UserEntity user);
+    void deleteByIdAndUser(Long id, UserEntity user);
 }

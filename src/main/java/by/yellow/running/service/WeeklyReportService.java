@@ -1,7 +1,11 @@
 package by.yellow.running.service;
 
-import by.yellow.running.entity.Running;
-import by.yellow.running.entity.WeeklyReport;
+import by.yellow.running.entity.WeeklyReportEntity;
+import by.yellow.running.mapper.WeeklyReportMapper;
+import by.yellow.running.model.Running;
+import by.yellow.running.model.WeeklyReport;
+import by.yellow.running.repository.WeeklyReportRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -9,6 +13,15 @@ import java.util.*;
 
 @Service
 public class WeeklyReportService implements IWeeklyReportService{
+
+    @Autowired
+    private WeeklyReportRepository weeklyReportRepository;
+
+    @Override
+    public WeeklyReport save(WeeklyReport weeklyReport) {
+        WeeklyReportEntity weeklyReportEntity = weeklyReportRepository.save(WeeklyReportMapper.INSTANCE.modelToEntity(weeklyReport));
+        return WeeklyReportMapper.INSTANCE.entityToModel(weeklyReportEntity);
+    }
 
     @Override
     public boolean isReportReady(WeeklyReport weeklyReport, Running running) {
@@ -21,7 +34,7 @@ public class WeeklyReportService implements IWeeklyReportService{
 
     @Override
     public WeeklyReport updateReport(WeeklyReport weeklyReport, Running running) {
-        weeklyReport.addRunning(running);
+        weeklyReport.getRunningSet().add(running);
         SortedSet<Running> runningSet = weeklyReport.getRunningSet();
         weeklyReport.setTotalDistance(calculateTotalDistance(weeklyReport));
         long totalTimeSeconds = calculateTotalTimeInSeconds(weeklyReport);

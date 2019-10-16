@@ -1,44 +1,40 @@
 package by.yellow.running.controller;
 
-import by.yellow.running.entity.User;
-import by.yellow.running.repository.UserRepository;
+import by.yellow.running.model.User;
+import by.yellow.running.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.Collection;
 
 @Controller
 @RequestMapping("/users")
 public class UserController {
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @GetMapping("/")
     public @ResponseBody
-    Iterable<User> getUsers(){
-        return userRepository.findAll();
+    Collection<User> getUsers(){
+        return userService.findAll();
     }
 
     @GetMapping("/{id}")
     public @ResponseBody
-    Optional<User> getUser(@PathVariable String id){
-        return userRepository.findById(Long.parseLong(id));
+    User getUser(@PathVariable String id){
+        return userService.findById(Long.parseLong(id));
     }
 
     @DeleteMapping("/{id}")
     public @ResponseBody String deleteUser(@PathVariable String id){
-        userRepository.deleteById(Long.parseLong(id));
+        userService.deleteById(Long.parseLong(id));
         return "User deleted";
     }
 
-    @DeleteMapping("/")
-    public @ResponseBody String deleteAllUsers(){
-        userRepository.deleteAll();
-        return "User deleted";
-    }
     @PostMapping("/")
-    public @ResponseBody User addNewUser(@RequestBody User user){
-        return userRepository.save(user);
+    public @ResponseBody
+    User addNewUser(@RequestBody User user){
+        return userService.save(user);
     }
 }

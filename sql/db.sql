@@ -18,16 +18,16 @@ USE `yellow` ;
 -- -----------------------------------------------------
 -- Table `yellow`.`User`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `yellow`.`User` ;
+DROP TABLE IF EXISTS `yellow`.`user` ;
 
-CREATE TABLE IF NOT EXISTS `yellow`.`User` (
-                                             `USER_ID` BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `yellow`.`user` (
+                                             `user_id` BIGINT NOT NULL AUTO_INCREMENT,
                                              `email` VARCHAR(45) NOT NULL,
                                              `username` VARCHAR(45) NOT NULL,
                                              `password` VARCHAR(300) NOT NULL,
-                                             `confirmPassword` VARCHAR(300),
-                                             PRIMARY KEY (`USER_ID`),
-                                             UNIQUE INDEX `USER_ID_UNIQUE` (`USER_ID` ASC) VISIBLE,
+                                             `confirm_password` VARCHAR(300),
+                                             PRIMARY KEY (`user_id`),
+                                             UNIQUE INDEX `USER_ID_UNIQUE` (`user_id` ASC) VISIBLE,
                                              UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
                                              UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE)
   ENGINE = InnoDB;
@@ -36,22 +36,22 @@ CREATE TABLE IF NOT EXISTS `yellow`.`User` (
 -- -----------------------------------------------------
 -- Table `yellow`.`WeeklyReport`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `yellow`.`WeeklyReport` ;
+DROP TABLE IF EXISTS `yellow`.`weekly_report` ;
 
-CREATE TABLE IF NOT EXISTS `yellow`.`WeeklyReport` (
-                                                     `WEEKLYREPORT_ID` BIGINT NOT NULL AUTO_INCREMENT,
-                                                     `weekNumber` INT,
-                                                     `averageSpeed` DOUBLE NOT NULL,
-                                                     `averageTime` VARCHAR(45) NOT NULL,
-                                                     `totalDistance` DOUBLE NOT NULL,
-                                                     `User_USER_ID` BIGINT,
-                                                     `startDate` TIMESTAMP NOT NULL,
-                                                     `endDate` TIMESTAMP NOT NULL,
-                                                     PRIMARY KEY (`WEEKLYREPORT_ID`),
-                                                     INDEX `fk_WeeklyReport_User1_idx` (`User_USER_ID` ASC) VISIBLE,
-                                                     CONSTRAINT `fk_WeeklyReport_User1`
-                                                       FOREIGN KEY (`User_USER_ID`)
-                                                         REFERENCES `yellow`.`User` (`USER_ID`)
+CREATE TABLE IF NOT EXISTS `yellow`.`weekly_report` (
+                                                     `weekly_report_id` BIGINT NOT NULL AUTO_INCREMENT,
+                                                     `week_number` INT,
+                                                     `average_speed` DOUBLE NOT NULL,
+                                                     `average_time` VARCHAR(45) NOT NULL,
+                                                     `total_distance` DOUBLE NOT NULL,
+                                                     `iser_user_id` BIGINT,
+                                                     `start_date` TIMESTAMP NOT NULL,
+                                                     `end_date` TIMESTAMP NOT NULL,
+                                                     PRIMARY KEY (`weekly_report_id`),
+                                                     INDEX `fk_weekly_report_user1_idx` (`user_user_id` ASC) VISIBLE,
+                                                     CONSTRAINT `fk_weekly_report_user1`
+                                                       FOREIGN KEY (`user_user_id`)
+                                                         REFERENCES `yellow`.`user` (`user_id`)
                                                          ON DELETE NO ACTION
                                                          ON UPDATE NO ACTION)
   ENGINE = InnoDB;
@@ -60,26 +60,26 @@ CREATE TABLE IF NOT EXISTS `yellow`.`WeeklyReport` (
 -- -----------------------------------------------------
 -- Table `yellow`.`Running`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `yellow`.`Running` ;
+DROP TABLE IF EXISTS `yellow`.`running` ;
 
-CREATE TABLE IF NOT EXISTS `yellow`.`Running` (
-                                                `RUNNING_ID` BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `yellow`.`running` (
+                                                `running_id` BIGINT NOT NULL AUTO_INCREMENT,
                                                 `distance` DOUBLE NOT NULL,
-                                                `startTime` TIMESTAMP,
-                                                `finishTime` TIMESTAMP,
-                                                `User_USER_ID` BIGINT,
-                                                `WeeklyReport_WEEKLYREPORT_ID` BIGINT,
-                                                PRIMARY KEY (`RUNNING_ID`),
-                                                INDEX `fk_Running_User_idx` (`User_USER_ID` ASC) VISIBLE,
-                                                INDEX `fk_Running_WeeklyReport1_idx` (`WeeklyReport_WEEKLYREPORT_ID` ASC) VISIBLE,
-                                                CONSTRAINT `fk_Running_User`
-                                                  FOREIGN KEY (`User_USER_ID`)
-                                                    REFERENCES `yellow`.`User` (`USER_ID`)
+                                                `start_time` TIMESTAMP,
+                                                `finish_Time` TIMESTAMP,
+                                                `user_user_id` BIGINT,
+                                                `weekly_report_weekly_report_id` BIGINT,
+                                                PRIMARY KEY (`running_id`),
+                                                INDEX `fk_running_user_idx` (`user_user_id` ASC) VISIBLE,
+                                                INDEX `fk_running_weekly_report1_idx` (`weekly_report_weekly_report_id` ASC) VISIBLE,
+                                                CONSTRAINT `fk_running_user`
+                                                  FOREIGN KEY (`user_user_id`)
+                                                    REFERENCES `yellow`.`user` (`user_id`)
                                                     ON DELETE NO ACTION
                                                     ON UPDATE NO ACTION,
-                                                CONSTRAINT `fk_Running_WeeklyReport1`
-                                                  FOREIGN KEY (`WeeklyReport_WEEKLYREPORT_ID`)
-                                                    REFERENCES `yellow`.`WeeklyReport` (`WEEKLYREPORT_ID`)
+                                                CONSTRAINT `fk_running_weekly_report1`
+                                                  FOREIGN KEY (`weekly_report_weekly_report_id`)
+                                                    REFERENCES `yellow`.`weekly_report` (`weekly_report_id`)
                                                     ON DELETE NO ACTION
                                                     ON UPDATE NO ACTION)
   ENGINE = InnoDB;
@@ -88,33 +88,33 @@ CREATE TABLE IF NOT EXISTS `yellow`.`Running` (
 -- -----------------------------------------------------
 -- Table `yellow`.`Role`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `yellow`.`Role` ;
+DROP TABLE IF EXISTS `yellow`.`role` ;
 
-CREATE TABLE IF NOT EXISTS `yellow`.`Role` (
-                                             `ROLE_ID` BIGINT NOT NULL,
+CREATE TABLE IF NOT EXISTS `yellow`.`role` (
+                                             `role_id` BIGINT NOT NULL,
                                              `name` VARCHAR(45) NOT NULL,
-                                             PRIMARY KEY (`ROLE_ID`))
+                                             PRIMARY KEY (`role_id`))
   ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
 -- Table `yellow`.`User_Role`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `yellow`.`User_Role` ;
+DROP TABLE IF EXISTS `yellow`.`user_role` ;
 
-CREATE TABLE IF NOT EXISTS `yellow`.`User_Role` (
-                                                  `User_USER_ID` BIGINT NOT NULL,
-                                                  `Role_ROLE_ID` BIGINT NOT NULL,
-                                                  INDEX `fk_User_Role_User1_idx` (`User_USER_ID` ASC) VISIBLE,
-                                                  INDEX `fk_User_Role_Role1_idx` (`Role_ROLE_ID` ASC) VISIBLE,
-                                                  CONSTRAINT `fk_User_Role_User1`
-                                                    FOREIGN KEY (`User_USER_ID`)
-                                                      REFERENCES `yellow`.`User` (`USER_ID`)
+CREATE TABLE IF NOT EXISTS `yellow`.`user_role` (
+                                                  `user_user_id` BIGINT NOT NULL,
+                                                  `role_role_id` BIGINT NOT NULL,
+                                                  INDEX `fk_user_role_user1_idx` (`user_user_id` ASC) VISIBLE,
+                                                  INDEX `fk_user_role_role1_idx` (`role_role_id` ASC) VISIBLE,
+                                                  CONSTRAINT `fk_user_role_user1`
+                                                    FOREIGN KEY (`user_user_id`)
+                                                      REFERENCES `yellow`.`user` (`user_id`)
                                                       ON DELETE NO ACTION
                                                       ON UPDATE NO ACTION,
-                                                  CONSTRAINT `fk_User_Role_Role1`
-                                                    FOREIGN KEY (`Role_ROLE_ID`)
-                                                      REFERENCES `yellow`.`Role` (`ROLE_ID`)
+                                                  CONSTRAINT `fk_user_role_role1`
+                                                    FOREIGN KEY (`role_role_id`)
+                                                      REFERENCES `yellow`.`role` (`role_id`)
                                                       ON DELETE NO ACTION
                                                       ON UPDATE NO ACTION)
   ENGINE = InnoDB;
@@ -129,7 +129,7 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `yellow`;
-INSERT INTO `yellow`.`User` (`USER_ID`, `email`, `username`, `password`) VALUES (1, 'elmatthw8@gmail.com', 'admin', 'admin');
+INSERT INTO `yellow`.`user` (`user_id`, `email`, `username`, `password`) VALUES (1, 'elmatthw8@gmail.com', 'admin', 'admin');
 
 COMMIT;
 
@@ -139,8 +139,8 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `yellow`;
-INSERT INTO `yellow`.`Role` (`ROLE_ID`, `name`) VALUES (1, 'admin');
-INSERT INTO `yellow`.`Role` (`ROLE_ID`, `name`) VALUES (2, 'user');
+INSERT INTO `yellow`.`role` (`role_id`, `name`) VALUES (1, 'admin');
+INSERT INTO `yellow`.`role` (`role_id`, `name`) VALUES (2, 'user');
 
 COMMIT;
 
@@ -150,7 +150,7 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `yellow`;
-INSERT INTO `yellow`.`User_Role` (`User_USER_ID`, `Role_ROLE_ID`) VALUES (1, 1);
+INSERT INTO `yellow`.`user_role` (`user_user_id`, `role_role_id`) VALUES (1, 1);
 
 COMMIT;
 

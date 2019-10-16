@@ -1,62 +1,61 @@
 package by.yellow.running.controller;
 
-import by.yellow.running.entity.Running;
-import by.yellow.running.entity.User;
-import by.yellow.running.repository.RunningRepository;
-import by.yellow.running.repository.UserRepository;
+import by.yellow.running.model.Running;
+import by.yellow.running.model.User;
 import by.yellow.running.service.IRunningService;
+import by.yellow.running.service.RunningService;
+import by.yellow.running.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @Controller
 public class RunningController {
 
-    private RunningRepository runningRepository;
-    private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
     @Autowired
     private IRunningService runningService;
 
     @Autowired
-    public RunningController(RunningRepository runningRepository, UserRepository userRepository) {
-        this.runningRepository = runningRepository;
-        this.userRepository = userRepository;
+    public RunningController(RunningService runningService, UserService userService) {
+        this.runningService = runningService;
+        this.userService = userService;
     }
 
-    @GetMapping("/users/{id}/running")
+    @GetMapping("/users/{id}/runnings")
     public @ResponseBody
-    Optional<Running> getRunningByUser(@PathVariable String id){
-        User user = userRepository.findById(Long.parseLong(id)).get();
-        return runningRepository.findAllByUser(user);
+    Iterable<Running> getRunningByUser(@PathVariable String id){
+        User user = userService.findById(Long.parseLong(id));
+        return runningService.findAllByUser(user);
     }
 
-    @GetMapping("/users/{user_id}/running/{running_id}")
-    public @ResponseBody Running getRunningByUserAndID(@PathVariable String user_id, @PathVariable String running_id){
-        User user = userRepository.findById(Long.parseLong(user_id)).get();
-        return runningRepository.findByIdAndUser(Long.parseLong(running_id), user);
+    @GetMapping("/users/{userId}/runnings/{runningId}")
+    public @ResponseBody
+    Running getRunningByUserAndID(@PathVariable String userId, @PathVariable String runningId){
+        User user = userService.findById(Long.parseLong(userId));
+        return runningService.findByIdAndUser(Long.parseLong(runningId), user);
     }
 
-    @PostMapping("/users/{user_id}/running")
-    public @ResponseBody Optional<Running> addRunning(@PathVariable String user_id, @RequestBody Running running){
-        User user = userRepository.findById(Long.parseLong(user_id)).get();
-        user.addRunning(running);
+    @PostMapping("/users/{userId}/runnings")
+    public @ResponseBody Running addRunning(@PathVariable String userId, @RequestBody Running running){
+        User user = userService.findById(Long.parseLong(userId));
         return runningService.addRunning(running);
     }
 
-    @DeleteMapping("/users/{user_id}/running/{running_id}")
-    public @ResponseBody String deleteRunning(@PathVariable String user_id, @PathVariable String running_id){
-        User user = userRepository.findById(Long.parseLong(user_id)).get();
-        runningRepository.deleteByIdAndUser(Long.parseLong(running_id), user);
+    @DeleteMapping("/users/{userId}/runnings/{runningId}")
+    public @ResponseBody String deleteRunning(@PathVariable String userId, @PathVariable String runningId){
+        User user = userService.findById(Long.parseLong(userId));
+        runningService.deleteByIdAndUser(Long.parseLong(runningId), user);
         return "Running deleted";
     }
 
-    @PutMapping("/users/{user_id}/running/{running_id}")
-    public @ResponseBody Running updateRunning(@PathVariable String user_id, @PathVariable String running_id, @RequestBody Running newRunning){
-        User user = userRepository.findById(Long.parseLong(user_id)).get();
-        Running running = runningRepository.findByIdAndUser(Long.parseLong(running_id), user);
-        runningRepository.save(newRunning);
+    @PutMapping("/users/{userId}/runnings/{runningId}")
+    public @ResponseBody
+    Running updateRunning(@PathVariable String userId, @PathVariable String runningId, @RequestBody Running newRunning){
+        User user = userService.findById(Long.parseLong(userId));
+        Running running = runningService.findByIdAndUser(Long.parseLong(runningId), user);
+        runningService.save(newRunning);
         running.setDistance(newRunning.getDistance());
         running.setStartTime(newRunning.getStartTime());
         running.setFinishTime(newRunning.getFinishTime());
