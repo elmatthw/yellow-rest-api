@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,8 +12,6 @@ import java.util.Date;
 public class Running {
     private Long id;
     private double distance;
-    private Date startTime;
-    private Date finishTime;
-    private User user;
-    private WeeklyReport weeklyReport;
+    private LocalDateTime startTime;
+    private LocalDateTime finishTime;
 }

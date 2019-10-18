@@ -2,59 +2,50 @@ package by.yellow.running.controller;
 
 import by.yellow.running.model.Running;
 import by.yellow.running.model.User;
-import by.yellow.running.service.IRunningService;
 import by.yellow.running.service.RunningService;
 import by.yellow.running.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class RunningController {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private IRunningService runningService;
+    private final UserService userService;
+    private final RunningService runningService;
 
-    @Autowired
-    public RunningController(RunningService runningService, UserService userService) {
-        this.runningService = runningService;
+    public RunningController(UserService userService, RunningService runningService) {
         this.userService = userService;
+        this.runningService = runningService;
     }
 
-    @GetMapping("/users/{id}/runnings")
+    @GetMapping("/users/{userId}/runnings")
     public @ResponseBody
-    Iterable<Running> getRunningByUser(@PathVariable String id){
-        User user = userService.findById(Long.parseLong(id));
-        return runningService.findAllByUser(user);
+    Iterable<Running> getRunningByUser(@PathVariable Long userId, @RequestParam int page, @RequestParam int limit){
+        return runningService.findAllByUserId(userId, page, limit);
     }
 
-    @GetMapping("/users/{userId}/runnings/{runningId}")
+    @GetMapping("/users/runnings/{runningId}")
     public @ResponseBody
-    Running getRunningByUserAndID(@PathVariable String userId, @PathVariable String runningId){
-        User user = userService.findById(Long.parseLong(userId));
-        return runningService.findByIdAndUser(Long.parseLong(runningId), user);
+    Running getRunningByUserAndID(@PathVariable Long runningId){
+        return runningService.findById(runningId);
     }
 
-    @PostMapping("/users/{userId}/runnings")
+    @PostMapping("/users/runnings")
     public @ResponseBody Running addRunning(@PathVariable String userId, @RequestBody Running running){
         User user = userService.findById(Long.parseLong(userId));
-        return runningService.addRunning(running);
+        return runningService.save(running);
     }
 
-    @DeleteMapping("/users/{userId}/runnings/{runningId}")
-    public @ResponseBody String deleteRunning(@PathVariable String userId, @PathVariable String runningId){
-        User user = userService.findById(Long.parseLong(userId));
-        runningService.deleteByIdAndUser(Long.parseLong(runningId), user);
+    @DeleteMapping("/users/runnings/{runningId}")
+    public @ResponseBody String deleteRunning(@PathVariable Long userId, @PathVariable Long runningId){
+        runningService.deleteById(runningId);
         return "Running deleted";
     }
 
-    @PutMapping("/users/{userId}/runnings/{runningId}")
+    @PutMapping("/users/runnings/{runningId}")
     public @ResponseBody
-    Running updateRunning(@PathVariable String userId, @PathVariable String runningId, @RequestBody Running newRunning){
-        User user = userService.findById(Long.parseLong(userId));
-        Running running = runningService.findByIdAndUser(Long.parseLong(runningId), user);
+    Running updateRunning(@PathVariable Long userId, @PathVariable Long runningId, @RequestBody Running newRunning){
+        Running running = runningService.findById(runningId);
         runningService.save(newRunning);
         running.setDistance(newRunning.getDistance());
         running.setStartTime(newRunning.getStartTime());

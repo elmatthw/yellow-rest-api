@@ -3,8 +3,7 @@ package by.yellow.running.controller;
 import by.yellow.running.exception.PasswordDoesntMatch;
 import by.yellow.running.exception.UsernameExistsException;
 import by.yellow.running.model.User;
-import by.yellow.running.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import by.yellow.running.service.UserServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,14 +13,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/registration")
 public class UserRegistrationController {
-    @Autowired
-    public UserService service;
+    private final UserServiceImpl service;
+
+    public UserRegistrationController(UserServiceImpl service) {
+        this.service = service;
+    }
 
     @PostMapping
     public @ResponseBody
     User registerAccount(@RequestBody User user) {
-        User registered = createUserAccount(user);
-        return registered;
+        return createUserAccount(user);
     }
 
     private User createUserAccount(User user){

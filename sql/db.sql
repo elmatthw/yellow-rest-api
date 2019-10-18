@@ -34,30 +34,6 @@ CREATE TABLE IF NOT EXISTS `yellow`.`user` (
 
 
 -- -----------------------------------------------------
--- Table `yellow`.`WeeklyReport`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `yellow`.`weekly_report` ;
-
-CREATE TABLE IF NOT EXISTS `yellow`.`weekly_report` (
-                                                     `weekly_report_id` BIGINT NOT NULL AUTO_INCREMENT,
-                                                     `week_number` INT,
-                                                     `average_speed` DOUBLE NOT NULL,
-                                                     `average_time` VARCHAR(45) NOT NULL,
-                                                     `total_distance` DOUBLE NOT NULL,
-                                                     `iser_user_id` BIGINT,
-                                                     `start_date` TIMESTAMP NOT NULL,
-                                                     `end_date` TIMESTAMP NOT NULL,
-                                                     PRIMARY KEY (`weekly_report_id`),
-                                                     INDEX `fk_weekly_report_user1_idx` (`user_user_id` ASC) VISIBLE,
-                                                     CONSTRAINT `fk_weekly_report_user1`
-                                                       FOREIGN KEY (`user_user_id`)
-                                                         REFERENCES `yellow`.`user` (`user_id`)
-                                                         ON DELETE NO ACTION
-                                                         ON UPDATE NO ACTION)
-  ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `yellow`.`Running`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `yellow`.`running` ;
@@ -68,20 +44,13 @@ CREATE TABLE IF NOT EXISTS `yellow`.`running` (
                                                 `start_time` TIMESTAMP,
                                                 `finish_Time` TIMESTAMP,
                                                 `user_user_id` BIGINT,
-                                                `weekly_report_weekly_report_id` BIGINT,
                                                 PRIMARY KEY (`running_id`),
                                                 INDEX `fk_running_user_idx` (`user_user_id` ASC) VISIBLE,
-                                                INDEX `fk_running_weekly_report1_idx` (`weekly_report_weekly_report_id` ASC) VISIBLE,
                                                 CONSTRAINT `fk_running_user`
                                                   FOREIGN KEY (`user_user_id`)
                                                     REFERENCES `yellow`.`user` (`user_id`)
                                                     ON DELETE NO ACTION
-                                                    ON UPDATE NO ACTION,
-                                                CONSTRAINT `fk_running_weekly_report1`
-                                                  FOREIGN KEY (`weekly_report_weekly_report_id`)
-                                                    REFERENCES `yellow`.`weekly_report` (`weekly_report_id`)
-                                                    ON DELETE NO ACTION
-                                                    ON UPDATE NO ACTION)
+                                                    ON UPDATE NO ACTION
   ENGINE = InnoDB;
 
 
@@ -123,6 +92,19 @@ CREATE TABLE IF NOT EXISTS `yellow`.`user_role` (
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+
+delimiter $$
+drop function if exists first_date;
+create function first_date() returns timestamp deterministic
+begin
+	declare result_date timestamp;
+	select start_time from running order by start_time limit 1 into result_date;
+    return result_date;
+end $$
+
+delimiter ;
 
 -- -----------------------------------------------------
 -- Data for table `yellow`.`User`
