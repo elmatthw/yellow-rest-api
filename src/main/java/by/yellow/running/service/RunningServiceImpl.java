@@ -1,14 +1,14 @@
 package by.yellow.running.service;
 
 import by.yellow.running.entity.RunningEntity;
+import by.yellow.running.entity.UserEntity;
 import by.yellow.running.exception.RunningDoesntExist;
+import by.yellow.running.exception.UserDoesNotExist;
 import by.yellow.running.mapper.RunningMapper;
-import by.yellow.running.mapper.UserMapper;
 import by.yellow.running.model.Running;
-import by.yellow.running.model.User;
 import by.yellow.running.model.WeeklyReport;
 import by.yellow.running.repository.RunningRepository;
-import org.springframework.data.domain.Page;
+import by.yellow.running.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,20 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RunningServiceImpl implements RunningService {
     private final RunningRepository runningRepository;
-    private final UserServiceImpl userService;
     private final RunningMapper runningMapper;
-    private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
-    public RunningServiceImpl(RunningRepository runningRepository, UserServiceImpl userService, RunningMapper runningMapper, UserMapper userMapper) {
+    public RunningServiceImpl(RunningRepository runningRepository, RunningMapper runningMapper, UserRepository userRepository) {
         this.runningRepository = runningRepository;
-        this.userService = userService;
         this.runningMapper = runningMapper;
-        this.userMapper = userMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -41,14 +38,11 @@ public class RunningServiceImpl implements RunningService {
 
     @Transactional
     @Override
-    public Collection<Running> findAllByUserId(Long userId, int page, int amountOfElements) {
-        Pageable pageable = PageRequest.of(page - 1, amountOfElements);
-        User user = userService.findById(userId);
-        return runningRepository.findAllByUser(userMapper.modelToEntity(user), pageable)
-                .stream()
+    public Collection<Running> findAllByUserId(Long userId, int page, int limit) {
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        return runningRepository.findAllByUserId(userId, pageable)
                 .map(runningMapper::entityToModel)
-                .collect(Collectors.toList());
-
+                .getContent();
     }
 
     @Override
@@ -57,25 +51,35 @@ public class RunningServiceImpl implements RunningService {
     }
 
     @Override
-    public WeeklyReport getWeeklyReportByWeekNumber(Long weekNumber, Long userId) {
-        return runningRepository.getWeeklyReportByWeekNumber(weekNumber, userId);
+    public WeeklyReport getWeeklyReportByWeekNumber(Long userId, Long weekNumber) {
+        return runningRepository.getWeeklyReportByWeekNumber(userId, weekNumber);
     }
 
     @Override
-    public Page<WeeklyReport> getWeeklyReports(Long userId, int page, int limit) {
+    public List<WeeklyReport> getWeeklyReports(Long userId, int page, int limit) {
         Pageable pageable = PageRequest.of(page - 1, limit);
-        return runningRepository.getWeeklyReports(userId, pageable);
+        return runningRepository.getWeeklyReports(userId, pageable).getContent();
     }
 
     @Override
-    public List<WeeklyReport> getWeeklyReportsFromTo(Long id, int page, int limit, int from, int to) {
+    public List<WeeklyReport> getWeeklyReportsFromTo(Long userId, int fromWeekNumber, int toWeekNumber, int page, int limit) {
         Pageable pageable = PageRequest.of(page - 1, limit);
-        return runningRepository.getWeeklyReportsFromTo(id, pageable, from, to);
+        return runningRepository.getWeeklyReportsFromTo(userId, pageable, fromWeekNumber, toWeekNumber);
     }
 
     @Override
     public Running save(Running running) {
         RunningEntity runningEntity = runningRepository.save(runningMapper.modelToEntity(running));
         return runningMapper.entityToModel(runningEntity);
+    }
+
+    @Override
+    public Running create(Long userId, Running running) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExist(String.format("User with id %d doesn't exist", userId)));
+        RunningEntity runningEntity = runningMapper.modelToEntity(running);
+        runningEntity.setUser(userEntity);
+        runningRepository.save(runningEntity);
+        return running;
     }
 }

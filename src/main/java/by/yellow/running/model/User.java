@@ -20,4 +20,11 @@ public class User {
     public User() {
         this.runningSet = new HashSet<>();
     }
+
+    public User(String email, String username, String password, String passwordConfirm) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.passwordConfirm = passwordConfirm;
+    }
 }

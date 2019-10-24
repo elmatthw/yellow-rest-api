@@ -17,9 +17,9 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "native")
     @Column(name = "user_id")
-    private Long Id;
+    private Long id;
     @NotNull
     @Size(min = 5, message = "Email must be at least 5 characters long")
     @Pattern(regexp = "^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$")
@@ -30,9 +30,13 @@ public class UserEntity {
     @NotNull
     @Size(min = 5, message = "Password must be at least 8 characters long")
     private String password;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<RunningEntity> runningSet;
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_role_id")
+    )
     private Set<RoleEntity> roles;
 
 }

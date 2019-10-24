@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RunningEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "native")
     @Column(name = "running_id")
     private Long id;
     @Column(name = "distance")
@@ -25,7 +25,7 @@ public class RunningEntity {
     private LocalDateTime startTime;
     @Column(name = "finish_time")
     private LocalDateTime finishTime;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_user_id")
     private UserEntity user;
 }

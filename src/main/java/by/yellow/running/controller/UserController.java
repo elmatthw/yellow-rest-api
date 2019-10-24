@@ -4,7 +4,8 @@ import by.yellow.running.model.User;
 import by.yellow.running.model.WeeklyReport;
 import by.yellow.running.service.RunningService;
 import by.yellow.running.service.UserService;
-import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,33 +36,31 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public @ResponseBody String deleteUser(@PathVariable String id){
-        userService.deleteById(Long.parseLong(id));
-        return "User deleted";
-    }
-
-    @PostMapping
     public @ResponseBody
-    User addNewUser(@RequestBody User user){
-        return userService.save(user);
+    ResponseEntity deleteUser(@PathVariable String id){
+        userService.deleteById(Long.parseLong(id));
+        return new ResponseEntity<>(String.format("User %s deleted", id), HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}/weeklyReports")
     public @ResponseBody
-    Page<WeeklyReport> getWeeklyReports(@PathVariable Long id, @RequestParam int page, @RequestParam int limit){
+    List<WeeklyReport> getWeeklyReports(@PathVariable Long id, @RequestParam int page, @RequestParam int limit){
         return runningService.getWeeklyReports(id, page, limit);
     }
 
     @GetMapping("/{id}/weeklyReports/{weekNumber}")
     public @ResponseBody
     WeeklyReport getWeeklyReportsByWeekNumber(@PathVariable Long id, @PathVariable Long weekNumber){
-        return runningService.getWeeklyReportByWeekNumber(weekNumber, id);
+        return runningService.getWeeklyReportByWeekNumber(id, weekNumber);
     }
 
     @GetMapping("/{id}/weeklyReports/weeks")
     public @ResponseBody
-    List<WeeklyReport> getWeeklyReportsFromTo(@PathVariable Long id, @RequestParam int page, @RequestParam int limit,
-                                  @RequestParam int from, @RequestParam int to){
-        return runningService.getWeeklyReportsFromTo(id, page, limit, from, to);
+    List<WeeklyReport> getWeeklyReportsFromTo(@PathVariable Long id,
+                                              @RequestParam int from,
+                                              @RequestParam int to,
+                                              @RequestParam int page,
+                                              @RequestParam int limit){
+        return runningService.getWeeklyReportsFromTo(id, from, to, page, limit);
     }
 }

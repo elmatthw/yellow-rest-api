@@ -1,0 +1,19 @@
+version: "3"
+services:
+  yellow-running-jdbc:
+    image: yellow-running-jdbc
+    ports:
+      - "8080:8080"
+    depends_on:
+      - yellowdb
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
+
+  yellowdb:
+    image: mysql:8
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=yellow
+    ports:
+      - "3306:3306"

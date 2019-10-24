@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -81,9 +80,8 @@ public class UserServiceImpl implements UserService {
     public Collection<User> findAll(int page, int amountOfElements) {
         Pageable pageable = PageRequest.of(page - 1, amountOfElements);
         return userRepository.findAll(pageable)
-                .stream()
                 .map(userMapper::entityToModel)
-                .collect(Collectors.toList());
+                .getContent();
     }
 
 }
