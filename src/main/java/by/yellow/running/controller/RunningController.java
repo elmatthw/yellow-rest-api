@@ -29,22 +29,23 @@ public class RunningController {
     }
 
     @PostMapping
-    public @ResponseBody
+    public
     ResponseEntity addRunning(@RequestParam Long userId, @RequestBody Running running){
         runningService.create(userId, running);
-        return new ResponseEntity<>(String.format("Running for User %d created", userId), HttpStatus.CREATED);
+        // вернуть айдишку или объект
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{runningId}")
-    public @ResponseBody
+    public
     ResponseEntity deleteRunning(@PathVariable Long runningId){
         runningService.deleteById(runningId);
-        return new ResponseEntity<>(String.format("Running %d deleted", runningId), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping
     public @ResponseBody
     Running updateRunning(@RequestBody Running newRunning){
-        return runningService.save(newRunning);
+        return runningService.update(newRunning);
     }
 }

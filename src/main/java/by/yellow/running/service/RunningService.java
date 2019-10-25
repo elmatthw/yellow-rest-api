@@ -11,7 +11,7 @@ public interface RunningService {
     Running findById(long id);
     Collection<Running> findAllByUserId(Long userId, int page, int amountOfElements);
     void deleteById(long id);
-    Running save(Running running);
+    Running update(Running running);
     Running create(Long userId, Running running);
     WeeklyReport getWeeklyReportByWeekNumber(@Param("weekNumber") Long weekNumber, @Param("userId") Long userId);
     List<WeeklyReport> getWeeklyReports(@Param("userId") Long userId, int page, int limit);

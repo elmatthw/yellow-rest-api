@@ -18,7 +18,7 @@ public class RunningEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "native")
     @Column(name = "running_id")
-    private Long id;
+    private Long runningId;
     @Column(name = "distance")
     private double distance;
     @Column(name = "start_time")

@@ -1,6 +1,4 @@
-package by.yellow.running.util;
-
-import by.yellow.running.model.WeeklyReport;
+package by.yellow.running.model;
 
 public class WeeklyReportImpl implements WeeklyReport {
     private Long weekNumber;

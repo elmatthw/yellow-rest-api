@@ -5,6 +5,7 @@ import by.yellow.running.entity.UserEntity;
 import by.yellow.running.exception.RunningDoesntExist;
 import by.yellow.running.exception.UserDoesNotExist;
 import by.yellow.running.mapper.RunningMapper;
+import by.yellow.running.mapper.UserMapper;
 import by.yellow.running.model.Running;
 import by.yellow.running.model.WeeklyReport;
 import by.yellow.running.repository.RunningRepository;
@@ -22,16 +23,18 @@ public class RunningServiceImpl implements RunningService {
     private final RunningRepository runningRepository;
     private final RunningMapper runningMapper;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public RunningServiceImpl(RunningRepository runningRepository, RunningMapper runningMapper, UserRepository userRepository) {
+    public RunningServiceImpl(RunningRepository runningRepository, RunningMapper runningMapper, UserRepository userRepository, UserMapper userMapper) {
         this.runningRepository = runningRepository;
         this.runningMapper = runningMapper;
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
     public Running findById(long id) {
-        RunningEntity runningEntity = runningRepository.findById(id)
+        RunningEntity runningEntity = runningRepository.findByRunningId(id)
                 .orElseThrow(() -> new RunningDoesntExist(String.format("Running with id %d doesn't exist", id)));
         return runningMapper.entityToModel(runningEntity);
     }
@@ -40,14 +43,14 @@ public class RunningServiceImpl implements RunningService {
     @Override
     public Collection<Running> findAllByUserId(Long userId, int page, int limit) {
         Pageable pageable = PageRequest.of(page - 1, limit);
-        return runningRepository.findAllByUserId(userId, pageable)
+        return runningRepository.findAllByUserUserId(userId, pageable)
                 .map(runningMapper::entityToModel)
                 .getContent();
     }
 
     @Override
     public void deleteById(long id) {
-        runningRepository.deleteById(id);
+        runningRepository.deleteByRunningId(id);
     }
 
     @Override
@@ -68,18 +71,22 @@ public class RunningServiceImpl implements RunningService {
     }
 
     @Override
-    public Running save(Running running) {
-        RunningEntity runningEntity = runningRepository.save(runningMapper.modelToEntity(running));
-        return runningMapper.entityToModel(runningEntity);
+    @Transactional
+    public Running update(Running running) {
+        RunningEntity runningEntity = runningRepository.findByRunningId(running.getRunningId()).get();
+        runningEntity.setDistance(running.getDistance());
+        runningEntity.setStartTime(running.getStartTime());
+        runningEntity.setFinishTime(running.getFinishTime());
+        return runningMapper.entityToModel(runningRepository.save(runningEntity));
     }
 
     @Override
+    @Transactional
     public Running create(Long userId, Running running) {
-        UserEntity userEntity = userRepository.findById(userId)
+        UserEntity userEntity = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserDoesNotExist(String.format("User with id %d doesn't exist", userId)));
-        RunningEntity runningEntity = runningMapper.modelToEntity(running);
-        runningEntity.setUser(userEntity);
-        runningRepository.save(runningEntity);
-        return running;
+        RunningEntity runningEntity = runningMapper.modelToEntity(running, userMapper.entityToModel(userEntity));
+        RunningEntity createdEntity = runningRepository.save(runningEntity);
+        return runningMapper.entityToModel(createdEntity);
     }
 }

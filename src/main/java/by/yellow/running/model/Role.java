@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Role {
-    private Long id;
+    private Long roleId;
     private String name;
 }

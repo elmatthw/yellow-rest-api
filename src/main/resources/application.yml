@@ -36,7 +36,7 @@ spring:
         naming:
           physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
   flyway:
-    locations: classpath:db/migrations
+    locations: classpath:db/migration
 logging:
   level:
     org:

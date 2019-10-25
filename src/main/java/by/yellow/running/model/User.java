@@ -9,7 +9,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
-    private Long id;
+    private Long userId;
     private String email;
     private String username;
     private String password;
@@ -26,5 +26,11 @@ public class User {
         this.username = username;
         this.password = password;
         this.passwordConfirm = passwordConfirm;
+    }
+
+    public User(String email, String username, String password) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
     }
 }

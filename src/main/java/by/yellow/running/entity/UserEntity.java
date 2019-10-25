@@ -19,7 +19,7 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "native")
     @Column(name = "user_id")
-    private Long id;
+    private Long userId;
     @NotNull
     @Size(min = 5, message = "Email must be at least 5 characters long")
     @Pattern(regexp = "^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$")

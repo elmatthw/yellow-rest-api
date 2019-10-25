@@ -10,11 +10,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RunningRepository extends JpaRepository<RunningEntity, Long> {
-    void deleteById(Long id);
-    Page<RunningEntity> findAllByUserId(Long userId, Pageable pageable);
+    void deleteByRunningId(Long id);
+    Optional<RunningEntity> findByRunningId(Long id);
+    Page<RunningEntity> findAllByUserUserId(Long userId, Pageable pageable);
     @Query(
             nativeQuery = true,
             value = "SELECT sum(distance) as totalDistance, " +

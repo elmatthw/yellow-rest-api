@@ -1,118 +1,118 @@
 package by.yellow.running.controller;
 
-import by.yellow.running.RunningApplicationTests;
 import by.yellow.running.model.User;
-import by.yellow.running.util.MySQLContainerConfig;
-import by.yellow.running.util.WeeklyReportImpl;
-import org.junit.ClassRule;
+import by.yellow.running.model.WeeklyReportImpl;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.support.BasicAuthenticationInterceptor;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-import org.testcontainers.containers.MySQLContainer;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(initializers = {RunningApplicationTests.Initializer.class})
-public class UserControllerIntegrationTest {
-
-    @ClassRule
-    public static MySQLContainer mySQL = MySQLContainerConfig.getInstance();
-    @Autowired
-    private Environment environment;
-    private String port;
-    private TestRestTemplate testRestTemplate = new TestRestTemplate();
+public class UserControllerIntegrationTest extends ControllerTest{
 
     @Test
     public void testNotExistingPersonByIdShouldReturn400() {
-        port = environment.getProperty("local.server.port");
-        ResponseEntity<User> result = testRestTemplate
-                .withBasicAuth("username", "password")
-                .getForEntity("http://localhost:" + port +
-                        "/users/3", User.class);
-        assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
-        assertNull(result.getBody().getUsername());
+        // given
+        User user1 = addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
+        User user2 = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        // when
+        try {
+            ResponseEntity<User> result = authorizedRestTemplate
+                    .getForEntity("http://localhost:" + port + "/users/" + user1.getUserId() + user2.getUserId(), User.class);
+        }
+        // then
+        catch (HttpClientErrorException ex) {
+            assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+        }
     }
 
     @Test
     public void testNotExistingMethodByIdShouldReturn405() {
-        port = environment.getProperty("local.server.port");
-        ResponseEntity<String> result = testRestTemplate.getForEntity("http://localhost:" + port +
-                "/registration", String.class);
-        assertEquals(HttpStatus.METHOD_NOT_ALLOWED, result.getStatusCode());
+        //when
+        try {
+            ResponseEntity<String> result = unauthorizedRestTemplate.getForEntity("http://localhost:" + port + "/registration",
+                    String.class);
+        }
+        // then
+        catch (HttpClientErrorException ex) {
+            assertEquals(HttpStatus.METHOD_NOT_ALLOWED, ex.getStatusCode());
+        }
     }
 
     @Test
     public void testGetAllUsersShouldReturn200() {
-        port = environment.getProperty("local.server.port");
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("username", "password"));
-        ResponseEntity<List<User>> response = restTemplate.exchange(
+        // given
+        addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
+        addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        // when
+        ResponseEntity<List<User>> response = authorizedRestTemplate.exchange(
                 "http://localhost:" + port + "/users?page=1&limit=10",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {
                 });
         List<User> users = response.getBody();
+       // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, users.size());
     }
 
     @Test
     public void testGetUserShouldReturn200() {
-        port = environment.getProperty("local.server.port");
-        ResponseEntity<User> result = testRestTemplate
-                .withBasicAuth("username", "password")
-                .getForEntity("http://localhost:" + port +
-                        "/users/1", User.class);
+        // given
+        addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
+        User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        // when
+        ResponseEntity<User> result = authorizedRestTemplate
+                .getForEntity("http://localhost:" + port + "/users/" + user.getUserId(), User.class);
+        // then
         assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals("admin", result.getBody().getUsername());
+        assertEquals("username", result.getBody().getUsername());
     }
 
     @Test
     public void testDeleteUserShouldReturn200() {
-        port = environment.getProperty("local.server.port");
-        testRestTemplate
-                .withBasicAuth("username", "password")
-                .delete("http://localhost:" + port +
-                        "/users/2");
-        ResponseEntity<User> result = testRestTemplate
-                .withBasicAuth("username", "password")
-                .getForEntity("http://localhost:" + port +
-                        "/users/2", User.class);
-        assertEquals(HttpStatus.OK, result.getStatusCode());
+        // given
+        User admin = addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
+        User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        // when
+        authorizedRestTemplate
+                .delete("http://localhost:" + port + "/users/" + user.getUserId());
+        try {
+            authorizedRestTemplate
+                    .getForEntity("http://localhost:" + port +
+                            "/users/" + user.getUserId(), User.class);
+        }
+        // then
+        catch (HttpClientErrorException ex){
+            assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+        }
     }
 
     @Test
     public void testGetWeeklyReportShouldReturn200() {
-        port = environment.getProperty("local.server.port");
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("username", "password"));
-        ResponseEntity<List<WeeklyReportImpl>> response = restTemplate.exchange(
-                "http://localhost:" + port + "/users/2/weeklyReports?page=1&limit=10",
+        // given
+        addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
+        User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+
+        addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
+        addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
+        addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);
+        addRunning(7.5,"2019.12.18 12:20", "2019.12.18 13:40", user);
+        // when
+        ResponseEntity<List<WeeklyReportImpl>> response = authorizedRestTemplate.exchange(
+                "http://localhost:" + port + "/users/" + user.getUserId() + "/weeklyReports?page=1&limit=10",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {
                 });
+        // then
         List<WeeklyReportImpl> weeklyReports = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, weeklyReports.size());
@@ -120,15 +120,22 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void testGetWeeklyReportFromWeekToWeek200() {
-        port = environment.getProperty("local.server.port");
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("username", "password"));
-        ResponseEntity<List<WeeklyReportImpl>> response = restTemplate.exchange(
-                "http://localhost:" + port + "/users/2/weeklyReports/weeks?from=201945&to=201949&page=1&limit=10",
+        // given
+        addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
+        User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+
+        addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
+        addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
+        addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);
+        addRunning(7.5,"2019.12.18 12:20", "2019.12.18 13:40", user);
+        // when
+        ResponseEntity<List<WeeklyReportImpl>> response = authorizedRestTemplate.exchange(
+                "http://localhost:" + port + "/users/" + user.getUserId() + "/weeklyReports/weeks?from=201945&to=201949&page=1&limit=10",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {
                 });
+        // then
         List<WeeklyReportImpl> weeklyReports = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, weeklyReports.size());
@@ -136,23 +143,20 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void testRegisterNewUser() {
-        port = environment.getProperty("local.server.port");
-        RestTemplate restTemplate = new RestTemplate();
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add("HeaderName", "value");
-        headers.add("Content-Type", "application/json");
+        //given
+        addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
+        addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
         User user = new User("newUser@email.com", "newUsername", "password", "password");
-        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-        HttpEntity<User> request = new HttpEntity<>(user, headers);
-        restTemplate.exchange(
+        //when
+        ResponseEntity<User> response = unauthorizedRestTemplate.exchange(
                 "http://localhost:" + port + "/registration",
                 HttpMethod.POST,
-                request,
-                String.class);
-        ResponseEntity<User> result = testRestTemplate
-                .withBasicAuth("newUsername", "password")
+                new HttpEntity<>(user, headers),
+                User.class);
+        //then
+        ResponseEntity<User> result = authorizedRestTemplate
                 .getForEntity("http://localhost:" + port +
-                        "/users/2", User.class);
+                        "/users/" + response.getBody().getUserId(), User.class);
         assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 }

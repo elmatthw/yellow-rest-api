@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/users/{\\d+}/*/*/*").hasAnyRole("admin", "user")
                 .antMatchers(HttpMethod.PUT, "/users/{\\d+}/*/*/*").hasAnyRole("admin", "user")
                 .antMatchers("/users/").hasRole("admin")
-                .antMatchers(HttpMethod.DELETE, "/users/**").hasRole("admin")
+                .antMatchers(HttpMethod.DELETE, "/users/{\\d+}/*/*/*").hasRole("admin")
                 .anyRequest().authenticated()
                 .and()
                 .csrf().disable()

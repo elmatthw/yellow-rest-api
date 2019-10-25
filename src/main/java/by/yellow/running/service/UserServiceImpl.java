@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long id) {
-        UserEntity userEntity = userRepository.findById(id)
+        UserEntity userEntity = userRepository.findByUserId(id)
                 .orElseThrow(() -> new UserDoesNotExist("User doesn't exist"));
         return userMapper.entityToModel(userEntity);
     }
