@@ -8,6 +8,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class UserControllerIntegrationTest extends ControllerTest{
         // given
         User user1 = addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user2 = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         // when
         try {
             ResponseEntity<User> result = authorizedRestTemplate
@@ -33,23 +35,11 @@ public class UserControllerIntegrationTest extends ControllerTest{
     }
 
     @Test
-    public void testNotExistingMethodByIdShouldReturn405() {
-        //when
-        try {
-            ResponseEntity<String> result = unauthorizedRestTemplate.getForEntity("http://localhost:" + port + "/registration",
-                    String.class);
-        }
-        // then
-        catch (HttpClientErrorException ex) {
-            assertEquals(HttpStatus.METHOD_NOT_ALLOWED, ex.getStatusCode());
-        }
-    }
-
-    @Test
     public void testGetAllUsersShouldReturn200() {
         // given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         // when
         ResponseEntity<List<User>> response = authorizedRestTemplate.exchange(
                 "http://localhost:" + port + "/users?page=1&limit=10",
@@ -68,6 +58,7 @@ public class UserControllerIntegrationTest extends ControllerTest{
         // given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         // when
         ResponseEntity<User> result = authorizedRestTemplate
                 .getForEntity("http://localhost:" + port + "/users/" + user.getUserId(), User.class);
@@ -81,6 +72,7 @@ public class UserControllerIntegrationTest extends ControllerTest{
         // given
         User admin = addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         // when
         authorizedRestTemplate
                 .delete("http://localhost:" + port + "/users/" + user.getUserId());
@@ -100,7 +92,7 @@ public class UserControllerIntegrationTest extends ControllerTest{
         // given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
-
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
         addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
         addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);
@@ -123,7 +115,7 @@ public class UserControllerIntegrationTest extends ControllerTest{
         // given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
-
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
         addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
         addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);
@@ -146,6 +138,7 @@ public class UserControllerIntegrationTest extends ControllerTest{
         //given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         User user = new User("newUser@email.com", "newUsername", "password", "password");
         //when
         ResponseEntity<User> response = unauthorizedRestTemplate.exchange(

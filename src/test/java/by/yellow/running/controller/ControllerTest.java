@@ -15,11 +15,13 @@ import by.yellow.running.util.MySQLContainerConfig;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.client.support.BasicAuthenticationInterceptor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,6 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.MySQLContainer;
 
@@ -34,6 +37,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashSet;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,7 +52,6 @@ public class ControllerTest {
     String port;
     static RestTemplate authorizedRestTemplate = new RestTemplate();
     static {
-        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         authorizedRestTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
     }
     static RestTemplate unauthorizedRestTemplate = new RestTemplate();
@@ -102,5 +106,18 @@ public class ControllerTest {
                                         LocalDateTime.parse(finishTime, DateTimeFormatter.ofPattern(dateTimePattern))), user
                         ));
         return runningMapper.entityToModel(runningEntity);
+    }
+
+    @Test
+    public void testNotExistingMethodByIdShouldReturn405() {
+        //when
+        try {
+            ResponseEntity<String> result = unauthorizedRestTemplate.getForEntity("http://localhost:" + port + "/registration",
+                    String.class);
+        }
+        // then
+        catch (HttpClientErrorException ex) {
+            assertEquals(HttpStatus.METHOD_NOT_ALLOWED, ex.getStatusCode());
+        }
     }
 }

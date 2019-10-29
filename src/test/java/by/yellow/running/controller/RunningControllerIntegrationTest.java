@@ -6,6 +6,7 @@ import by.yellow.running.model.WeeklyReportImpl;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,7 @@ public class RunningControllerIntegrationTest extends ControllerTest{
         //Given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
-
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
         addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
         addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);
@@ -41,6 +42,7 @@ public class RunningControllerIntegrationTest extends ControllerTest{
         //Given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
         addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
         addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);
@@ -60,8 +62,10 @@ public class RunningControllerIntegrationTest extends ControllerTest{
     @Transactional
     public void testPostRunning() {
         //Given
+        deleteAllFromDatabase();
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+
         addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
         addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
         addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);
@@ -72,6 +76,7 @@ public class RunningControllerIntegrationTest extends ControllerTest{
                 LocalDateTime.parse("2019.12.17 11:00", DateTimeFormatter.ofPattern(dateTimePattern))
         );
         // when
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("username", "password"));
         ResponseEntity<Running> runningResponse = authorizedRestTemplate
                 .exchange("http://localhost:"
                                 + port + "/runnings?userId="+user.getUserId(),
@@ -91,6 +96,7 @@ public class RunningControllerIntegrationTest extends ControllerTest{
         //Given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
         addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
         addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);
@@ -117,13 +123,14 @@ public class RunningControllerIntegrationTest extends ControllerTest{
         //Given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("username", "password"));
         addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
         addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
         addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);
         Running running = addRunning(7.5,"2019.12.18 12:20", "2019.12.18 13:40", user);
         // when
         authorizedRestTemplate
-                .delete("http://localhost:" + port + "/runnings/" + running.getRunningId());
+                .delete("http://localhost:" + port + "/runnings/" + running.getRunningId(), new HttpEntity<>(headers));
         // then
         ResponseEntity<List<Running>> response = authorizedRestTemplate.exchange(
                 "http://localhost:" + port + "/runnings?page=1&limit=10&userId="+ user.getUserId(),
@@ -140,6 +147,7 @@ public class RunningControllerIntegrationTest extends ControllerTest{
         //Given
         addUsers("elmatthw8@gmail.com", "admin", bCryptPasswordEncoder.encode("admin"));
         User user = addUsers("email@email.com", "username", bCryptPasswordEncoder.encode("password"));
+        authorizedRestTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "admin"));
         addRunning(2.2, "2019.12.14 09:20", "2019.12.14 10:50", user);
         addRunning(5D, "2019.12.15 09:00", "2019.12.15 10:10", user);
         addRunning(10D,"2019.12.13 09:20", "2019.12.13 11:00", user);

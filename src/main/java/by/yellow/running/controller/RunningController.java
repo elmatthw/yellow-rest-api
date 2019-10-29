@@ -29,11 +29,9 @@ public class RunningController {
     }
 
     @PostMapping
-    public
-    ResponseEntity addRunning(@RequestParam Long userId, @RequestBody Running running){
-        runningService.create(userId, running);
-        // вернуть айдишку или объект
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public @ResponseBody
+    Running addRunning(@RequestParam Long userId, @RequestBody Running running){
+        return runningService.create(userId, running);
     }
 
     @DeleteMapping("/{runningId}")
